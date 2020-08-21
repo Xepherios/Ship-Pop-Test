@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        #search {
+            width: 800px;
+        }
+        .left {
+            width: 100px;
+        }
+        .line {
+            padding: 10px;
+        }
+        .line div {
+            display: inline-block;
+        }
+        .line.search-algo {
+           margin-left: auto;
+           margin-right: auto;
+           width: 500px;
+        }
+        #search_for {
+            width: 100px;
+        }
+        .result {
+            border: 1px solid #000;
+            width: 500px;
+            height: 500px;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id = "search">
+        <div class="line">
+            <div class="left">List</div>
+            <div><input type="text" id="list" v-model="list" /></div>
+        </div>
+        <div class="line">
+            <div class="left">ค้นหา</div>
+            <div> <input type="text" id="search_for" v-model="search_for"/> <button v-on:click="search">ค้นหา</button></div>
+        </div>
+        <div class="line search-algo">
+            <h3>ประเภทการค้นหา</h3>
+            <select v-model="search_algo"> 
+                <option value="linear">Linear Search</option>
+                <option value="binary">Binary Search</option>
+                <option value="bubble">Bubble Search</option>
+            </select>
+        </div>
+        <h3>ผลลัพธ์</h3>
+        <div class="result">
+            <div v-if="results.length > 0" v-for="result in results">{{result}}</div>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#search',
+            data: {
+                list: '',
+                search_for: '',
+                search_algo: 'linear',
+                results: [],
+                found: false
+            },
+            methods: {
+                search: function () {
+                    this.results = []
+                    this.found = false
+                    this.results.push('List : ' + this.list)
+                    this.results.push('Search : ' + this.search_for)
+                    this.results.push('Result :::')
+                    if(this.search_algo == 'linear') {
+                        this.linear()
+                    } else if (this.search_algo == 'binary') {
+                        this.binary()
+                    } else {
+                        this.bubble()
+                    }
+                },
+                linear: function () {
+                    let splitList = this.list.replace(' ', '')
+                    splitList = splitList.split(',')
+                    splitList.map(Number)
+                    let searchValue = parseInt(this.search_for)
+                    for(let i = 0; i < splitList.length; i++) {
+                        let resultStr = ''
+                        let listValue = parseInt(splitList[i])
+                        if ( listValue === searchValue ) {
+                            resultStr = 'ROUND ' + (i+1) + ' ===> ' + searchValue + ' = ' + listValue + ' found!!'
+                            this.found = true
+                        } else {
+                            resultStr = 'ROUND ' + (i+1) + ' ===> ' + searchValue + ' != ' + listValue
+                        }
+                        this.results.push(resultStr)
+                        if (this.found) {
+                            break
+                        }
+                    }
+                },
+                binary: function () {
+                    let splitList = this.list.replace(' ', '')
+                    splitList = splitList.split(',')
+                    splitList.map(Number)
+                    splitList.sort((a,b)=>a-b)
+                    let searchValue = parseInt(this.search_for)
+                    let low = 0, high = splitList.length, mid = 0, i = 1
+
+                    while ( low <= high ) {
+                        mid = Math.floor((low + high) / 2)
+                        let listValue = parseInt(splitList[mid])
+                        if (listValue === searchValue) {
+                            resultStr = 'ROUND ' + (i+1) + ' ===> ' + searchValue + ' = ' + listValue + ' found!!'
+                            this.found = true
+                        } else {
+                            if (searchValue < listValue) {
+                                high = mid - 1
+                            } else {
+                                low = mid + 1
+                            }    
+                            resultStr = 'ROUND ' + (i+1) + ' ===> ' + searchValue + ' != ' + listValue
+                        }
+                        
+                        this.results.push(resultStr)
+                        if (this.found) {
+                            break
+                        }
+                        i++
+                    }
+                },
+                bubble: function () {
+                    let splitList = this.list.replace(' ', '')
+                    splitList = splitList.split(',')
+                    splitList.map(Number)
+                    let swap;
+                    do {
+                        swap = false;
+                        for (let i = 0; i < splitList.length; i++) {
+                            if (splitList[i] > splitList[i + 1]) {
+                                let tmp = splitList[i]
+                                splitList[i] = splitList[i + 1]
+                                splitList[i + 1] = tmp
+                                swap = true
+                            }
+                        }
+                    } while (swap)
+                    this.results.push('Sorted List : ' + splitList)
+                }
+            }
+        })
+    </script>
+</body>
+</html>
